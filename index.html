@@ -24,7 +24,7 @@ label{display:block;color:#b9c7dc;font-size:12px;margin:0 0 7px}.control{margin:
 <header class="top"><div class="brand"><div class="mark">π</div><div><div class="eyebrow">Interactive mathematics</div><h1>Prime Number Lab</h1></div></div><div class="topnote">Explore the structure behind<br>the building blocks of arithmetic</div></header>
 <section class="hero"><div class="eyebrow">From elementary number theory to the zeta function</div><h2>Prime numbers are simple.<br>Their patterns are not.</h2><p>Experiment with prime gaps, factorisation, prime-counting, Euler’s product and the zeros of the Riemann zeta function. Every control updates the mathematics in your browser.</p></section>
 <nav class="tabs" aria-label="Labs">
-<button class="tab active" data-tab="explorer">Prime explorer</button><button class="tab" data-tab="distribution">Distribution</button><button class="tab" data-tab="patterns">Prime patterns</button><button class="tab" data-tab="reciprocal">Reciprocal sum</button><button class="tab" data-tab="euler">Euler product</button><button class="tab" data-tab="zeros">Zeta zeros</button><button class="tab" data-tab="rsa">RSA demo</button>
+<button class="tab active" data-tab="explorer">Prime explorer</button><button class="tab" data-tab="distribution">Distribution</button><button class="tab" data-tab="projections">Projections</button><button class="tab" data-tab="patterns">Prime patterns</button><button class="tab" data-tab="reciprocal">Reciprocal sum</button><button class="tab" data-tab="euler">Euler product</button><button class="tab" data-tab="zeros">Zeta zeros</button><button class="tab" data-tab="rsa">RSA demo</button>
 </nav>
 
 <section class="panel active" id="explorer">
@@ -41,6 +41,16 @@ label{display:block;color:#b9c7dc;font-size:12px;margin:0 0 7px}.control{margin:
 <div class="card span-8"><h3>π(x), x / ln(x), and Li(x)</h3><canvas class="chart" id="distChart" aria-label="Prime counting chart"></canvas><div class="legend"><span><i class="dot" style="background:#69d7d0"></i>Actual π(x)</span><span><i class="dot" style="background:#f2c879"></i>x / ln(x)</span><span><i class="dot" style="background:#8bafff"></i>Li(x)</span></div></div>
 <div class="card span-4"><h3>Set the range</h3><div class="control"><div class="range-row"><label for="distMax">Maximum x</label><output id="distOut">500</output></div><input id="distMax" type="range" min="100" max="5000" step="100" value="500"></div><div class="control"><label for="inspectX">Inspect a particular x</label><input id="inspectX" type="number" min="10" max="500" value="100"></div><div class="metrics" style="grid-template-columns:1fr 1fr"><div class="metricbox"><div class="metric-label">Actual π(x)</div><div class="metric" id="actualPi">—</div></div><div class="metricbox"><div class="metric-label">Li(x)</div><div class="metric" id="liValue">—</div></div></div><div class="notice">The Prime Number Theorem says π(x) ~ x/ln(x). The logarithmic integral Li(x) is usually a closer smooth approximation. Neither is an exact prime counter.</div></div>
 <div class="card span-12"><h3>What the approximation means</h3><div class="formula">π(x) ~ Li(x) ~ x / ln(x) &nbsp; as x → ∞</div><p class="small">The symbol ~ means the ratio tends to 1 as x grows. It does not mean the curves are identical. Their difference contains information about the irregularity of prime distribution.</p></div>
+</div></section>
+
+
+<section class="panel" id="projections">
+<div class="section-head"><div><h2>Prime projections & asymptotics</h2><p>Compare exact arithmetic data with large-scale mathematical predictions.</p></div></div>
+<div class="grid">
+<div class="card span-12"><div class="range-row"><div><h3 style="margin-bottom:3px">Prime-counting projection</h3><p class="small">Exact π(x) against the logarithmic integral and x / ln(x).</p></div><output id="projMaxOut">20,000</output></div><input id="projMax" type="range" min="2000" max="100000" step="2000" value="20000"><canvas class="chart" id="projPiChart"></canvas><div class="legend"><span><i class="dot" style="background:#69d7d0"></i>Exact π(x)</span><span><i class="dot" style="background:#8bafff"></i>Li(x)</span><span><i class="dot" style="background:#f2c879"></i>x / ln(x)</span></div><p class="small">The smooth curves are asymptotic estimates, not forecasts with statistical confidence intervals. The exact staircase is computed by a sieve up to the selected cutoff.</p></div>
+<div class="card span-6"><h3>Reciprocal-prime growth</h3><p class="small">Partial sums compared with the Mertens asymptotic expression.</p><canvas class="chart" id="projRecipChart"></canvas><div class="legend"><span><i class="dot" style="background:#69d7d0"></i>Σ 1/p</span><span><i class="dot" style="background:#f2c879"></i>ln ln(x) + B₁</span></div><p class="small">B₁ ≈ 0.2614972128 is the Meissel–Mertens constant. The asymptotic relation describes long-run growth.</p></div>
+<div class="card span-6"><h3>Explicit-formula reconstruction</h3><p class="small">Chebyshev ψ(x): exact prime-power sum and a finite zero approximation.</p><canvas class="chart" id="projPsiChart"></canvas><div class="legend"><span><i class="dot" style="background:#69d7d0"></i>Exact ψ(x)</span><span><i class="dot" style="background:#ed9cc2"></i>20-zero approximation</span></div><p class="small">The oscillatory curve uses the first 20 positive zero ordinates and their conjugates. Finite truncation produces visible error and is not an exact identity.</p></div>
+<div class="card span-12"><h3>Reading the projections</h3><div class="two-col"><div class="formula">π(x) ~ Li(x) ~ x / ln(x)</div><div class="formula">Σ<sub>p ≤ x</sub> 1/p = ln ln(x) + B₁ + o(1)</div></div><p class="small">These are asymptotic statements as x tends to infinity. They describe systematic large-scale behaviour while leaving room for local irregularities. No extrapolation here should be interpreted as a guaranteed prediction at a particular finite x.</p></div>
 </div></section>
 
 <section class="panel" id="patterns">
@@ -97,17 +107,34 @@ function updateEuler(){const s=+$("eulerS").value,cut=+$("eulerCut").value,ps=si
 function psiExact(x){let sum=0;const ps=sieve(x);for(const p of ps){let q=p;while(q<=x){sum+=Math.log(p);if(q>x/p)break;q*=p}}return sum}
 function zeroPair(x,g){const a=.5*Math.log(x),b=g*Math.log(x),den=.25+g*g;const re=(.5*Math.cos(b)+g*Math.sin(b))/den;return -2*Math.sqrt(x)*re}
 function updateZeros(){const n=+$("zeroCount").value,x=+$("zeroX").value;$("zeroCountOut").textContent=n;$("zeroXOut").textContent=x;draw("zeroChart",[{color:"#69d7d0",data:zeros.map(g=>[.5,g]),points:true,width:0}],{xmin:0,xmax:1,ymin:0,ymax:80});const rows=zeros.slice(0,n).map((g,i)=>({i,g,c:zeroPair(x,g)}));$("zeroRows").innerHTML=rows.map(r=>"<tr><td>"+(r.i+1)+"</td><td>"+r.g.toFixed(6)+"</td><td>"+fmt(r.c,8)+"</td></tr>").join("");const sum=rows.reduce((s,r)=>s+r.c,0),approx=x-sum-Math.log(2*Math.PI)-.5*Math.log(1-1/(x*x)),exact=psiExact(x);$("psiApprox").textContent=fmt(approx,6);$("psiExact").textContent=fmt(exact,6);$("psiDifference").textContent="Truncation error versus exact ψ(x): "+fmt(approx-exact,6)+" (using "+n+" positive zero pairs)."}
+
+function updateProjections(){
+ const max=+$("projMax").value;
+ $("projMaxOut").textContent=fmt(max,0);
+ const ps=sieve(max),xs=[];
+ for(let i=0;i<=180;i++)xs.push(10+(max-10)*i/180);
+ const exact=xs.map(x=>[x,pi(x,ps)]),logEst=xs.map(x=>[x,x/Math.log(x)]),liEst=xs.map(x=>[x,li(x)]);
+ draw("projPiChart",[{color:"#69d7d0",data:exact},{color:"#8bafff",data:liEst},{color:"#f2c879",data:logEst}],{ymin:0});
+ let sum=0;const recip=[],asym=[];
+ ps.forEach(p=>{sum+=1/p;if(p>=10){recip.push([p,sum]);asym.push([p,Math.log(Math.log(p))+.2614972128])}});
+ draw("projRecipChart",[{color:"#69d7d0",data:recip},{color:"#f2c879",data:asym}],{ymin:0});
+ const psiXs=[];for(let i=0;i<=90;i++)psiXs.push(10+(Math.min(max,5000)-10)*i/90);
+ const exactPsi=psiXs.map(x=>[x,psiExact(x)]);
+ const approxPsi=psiXs.map(x=>{let v=x-Math.log(2*Math.PI)-.5*Math.log(1-1/(x*x));for(const g of zeros)v+=zeroPair(x,g);return [x,v]});
+ draw("projPsiChart",[{color:"#69d7d0",data:exactPsi},{color:"#ed9cc2",data:approxPsi}]);
+}
+
 function powmod(a,b,m){let r=1n,A=BigInt(a),B=BigInt(b),M=BigInt(m);while(B>0n){if(B&1n)r=r*A%M;A=A*A%M;B>>=1n}return Number(r)}
 function updateRSA(){const p=+$("rsaP").value,q=+$("rsaQ").value,n=p*q;let out=$("rsaOutput");if(!prime(p)||!prime(q)||p===q){out.innerHTML='<div class="notice">Enter two distinct primes.</div>';return}const phi=(p-1)*(q-1);let e=17;while(gcd(e,phi)!==1)e+=2;let d=inv(e,phi);const m=Math.max(0,Math.min(n-1,Math.floor(+$("rsaMessage").value||0))),c=powmod(m,e,n),dec=powmod(c,d,n);out.innerHTML='<div class="formula">n = '+n+'<br>φ(n) = '+phi+'<br>Public exponent e = '+e+'<br>Private exponent d = '+d+'</div><div class="metrics" style="margin-top:12px"><div class="metricbox"><div class="metric-label">Ciphertext</div><div class="metric">'+c+'</div></div><div class="metricbox"><div class="metric-label">Decrypted</div><div class="metric">'+dec+'</div></div></div>'}
 function gcd(a,b){while(b)[a,b]=[b,a%b];return a}
 function inv(a,m){let [t,nt,r,nr]=[0,1,m,a];while(nr){let q=Math.floor(r/nr);[t,nt]=[nt,t-q*nt];[r,nr]=[nr,r-q*nr]}return (t%m+m)%m}
-document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".panel").forEach(x=>x.classList.toggle("active",x.id===b.dataset.tab));requestAnimationFrame(()=>{({explorer:updateExplorer,distribution:updateDistribution,patterns:updatePatterns,reciprocal:updateReciprocal,euler:updateEuler,zeros:updateZeros,rsa:updateRSA})[b.dataset.tab]?.()})}));
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".panel").forEach(x=>x.classList.toggle("active",x.id===b.dataset.tab));requestAnimationFrame(()=>{({explorer:updateExplorer,distribution:updateDistribution,patterns:updatePatterns,reciprocal:updateReciprocal,euler:updateEuler,zeros:updateZeros,rsa:updateRSA,projections:updateProjections})[b.dataset.tab]?.()})}));
 ["factorN","sieveLimit"].forEach(id=>$(id).addEventListener("input",updateExplorer));
-["distMax","inspectX"].forEach(id=>$(id).addEventListener("input",updateDistribution));
+["distMax","inspectX"].forEach(id=>$(id).addEventListener("input",updateDistribution));$("projMax").addEventListener("input",updateProjections);
 ["patternMax"].forEach(id=>$(id).addEventListener("input",updatePatterns));$("squarePrime").addEventListener("input",updateSquares);
 $("recipMax").addEventListener("input",updateReciprocal);["eulerS","eulerCut"].forEach(id=>$(id).addEventListener("input",updateEuler));
 ["zeroCount","zeroX"].forEach(id=>$(id).addEventListener("input",updateZeros));["rsaP","rsaQ","rsaMessage"].forEach(id=>$(id).addEventListener("input",updateRSA));
-let resizeTimer;window.addEventListener("resize",()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{const active=document.querySelector(".tab.active")?.dataset.tab;({distribution:updateDistribution,patterns:updatePatterns,reciprocal:updateReciprocal,zeros:updateZeros})[active]?.()},120)});
-updateExplorer();updateDistribution();updatePatterns();updateSquares();updateReciprocal();updateEuler();updateZeros();updateRSA();
+let resizeTimer;window.addEventListener("resize",()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{const active=document.querySelector(".tab.active")?.dataset.tab;({distribution:updateDistribution,projections:updateProjections,patterns:updatePatterns,reciprocal:updateReciprocal,zeros:updateZeros})[active]?.()},120)});
+updateExplorer();updateDistribution();updateProjections();updatePatterns();updateSquares();updateReciprocal();updateEuler();updateZeros();updateRSA();
 </script>
 </body></html>
